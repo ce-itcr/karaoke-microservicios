@@ -1,0 +1,30 @@
+{
+  "name": "karaoke-api",
+  "version": "1.0.0",
+  "description": "karaoke's API",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/index.js",
+    "test": "mocha --recursive --exit --timeout 10000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ce-itcr/karaoke-api.git"
+  },
+  "author": "ce-itcr",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ce-itcr/karaoke-api/issues"
+  },
+  "homepage": "https://github.com/ce-itcr/karaoke-api#readme",
+  "dependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "joi": "^17.4.2",
+    "mocha": "^9.1.2",
+    "mongoose": "^6.0.9",
+    "pm2": "^5.1.2"
+  }
+}
