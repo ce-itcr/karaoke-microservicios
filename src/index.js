@@ -11,7 +11,7 @@ app.all('/', function(req, res, next) {
     next();
 });
 
-app.use('/api/v1/songs', require('./routes/songs.routes'));
+app.use('/api/v1/stats', require('./routes/stats.routes'));
 
 app.get('/', (req, res) => { return res.status(200).send('Are you lost?'); });
 app.get('*', (req, res)  => { res.status(405).send('Method does not exist'); });
