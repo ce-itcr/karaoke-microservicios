@@ -8,13 +8,42 @@ const scoreCalculator = (req, res) => {
     let userLyrics = req.body.text
     let actualLyrics = req.body.lyrics
 
-    console.log("\n\n\n")
+    
     userLyrics = lineToList(userLyrics);
-    console.log("\n\n\n")
-    actualLyrics = lineToList(extractLines(actualLyrics));
-    //console.log(result);
+    actualLyrics = lineToList(extractLines(actualLyrics.trim()));
 
-    res.status(400).send(' Entramos ');
+    console.log(userLyrics);
+    console.log(actualLyrics);
+
+    var counter = 0;
+    var lyricsWords = actualLyrics.length;
+    var userWords = userLyrics.length;
+    var successCounter = 0;
+    var errorCounter = 0;
+
+    var errors = [];
+
+    while(counter < userWords){
+        if(actualLyrics.includes(userLyrics[counter])){
+            actualLyrics.splice(actualLyrics.indexOf(userLyrics[counter]),1);
+            successCounter += 1;
+        }else{
+            errors.push(userLyrics[counter]);
+            errorCounter += 1;
+        }
+        counter++;
+    }
+
+    score = ((successCounter - errorCounter)/lyricsWords) * 100
+    accuracy = ((successCounter - errorCounter)/userWords) * 100
+    
+
+    console.log(successCounter);
+    console.log(errorCounter);
+
+    var response = {"score":Math.round(score), "accuracy":Math.round(accuracy), "successCounter":successCounter, "errorCounter":errorCounter}
+
+    res.status(200).send(response);
 };
 
 function extractLines (lyrics){
@@ -55,7 +84,7 @@ function lineToList(line){
     var word = "";
     result = [];
 
-    while(counter < line.length ){
+    while(counter < line.length){
 
         if(line[counter] != " " && line[counter] != "," && line[counter] != "¿" && line[counter] != "?" && line[counter] != "."){
             word += line[counter];
@@ -68,7 +97,6 @@ function lineToList(line){
         counter++;
     }
     result.push(word.toUpperCase());
-    console.log(result);
     return result;
 }
 
