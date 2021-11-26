@@ -6,6 +6,6 @@ const { scoreCalculator, findUserWords } = require('../components/stats.componen
 var jsonParser = bodyParser.json();
 
 router.post('/getScore', jsonParser, scoreCalculator);
-router.get('/getDifficultWords', jsonParser, findUserWords);
+router.get('/getDifficultWords/:username', findUserWords);
 
 module.exports = router;

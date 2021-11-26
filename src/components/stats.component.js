@@ -133,10 +133,10 @@ function lineToList(line){
 
 function findUserWords(req, res){
 
-    let currentUser = req.body.username;
+    let currentUser = JSON.parse(req.params.username);
 
     const databaseConnection = getConnection();
-    databaseConnection.collection("users").findOne({"userId": currentUser}, { projection: { _id:0 } }, 
+    databaseConnection.collection("users").findOne({"userId": currentUser.username}, { projection: { _id:0 } }, 
         async function(error, data) {
             if (error) {
                 console.log('⛔️ An error occurred getting single users ... \n[Error]: ' + error);
@@ -147,9 +147,7 @@ function findUserWords(req, res){
                     return res.status(400).send("Error");
                 } else{
                     var wordsList = await findDifficulty(data["lessDifficulty"], data["greaterDifficulty"]);
-                    console.log(wordsList)
                     var message = JSON.stringify({'mostDifficult': wordsList[0], 'leastDifficult': wordsList[1]});
-                    console.log(message);
                     return res.status(200).send(message);
                 }
             }
