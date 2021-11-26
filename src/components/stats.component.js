@@ -131,4 +131,85 @@ function lineToList(line){
     return result;
 }
 
-module.exports = { scoreCalculator }
+function findUserWords(req, res){
+
+    let currentUser = req.body.username;
+
+    const databaseConnection = getConnection();
+    databaseConnection.collection("users").findOne({"userId": currentUser}, { projection: { _id:0 } }, 
+        async function(error, data) {
+            if (error) {
+                console.log('⛔️ An error occurred getting single users ... \n[Error]: ' + error);
+                return res.status(400).send("Error");
+            } else {
+                if(data === null){
+                    console.log('⚠️ There are no users with the specified specifications ...');
+                    return res.status(400).send("Error");
+                } else{
+                    var wordsList = await findDifficulty(data["lessDifficulty"], data["greaterDifficulty"]);
+                    console.log(wordsList)
+                    var message = JSON.stringify({'mostDifficult': wordsList[0], 'leastDifficult': wordsList[1]});
+                    console.log(message);
+                    return res.status(200).send(message);
+                }
+            }
+        });
+}
+
+function findDifficulty(Easy, Difficult){
+    var easyList = [];
+    var hardList = [];
+    var exist = false;
+    Easy.forEach(element => {
+        easyList.forEach(subList => {
+            if(subList.includes(element)){
+                subList[1] += 1;
+                exist = true
+            }
+        });
+        if(!exist){
+            easyList.push([element, 1]);
+        }
+        exist = false
+    });
+    orderSublist(easyList, easyList.length);
+    if (easyList.length > 3){
+        easyList = easyList.slice(-4,-1);
+    }
+    Difficult.forEach(element => {
+        hardList.forEach(subList => {
+            if(subList.includes(element)){
+                subList[1] += 1;
+                exist = true
+            }
+        });
+        if(!exist){
+            hardList.push([element, 1]);
+        }
+        exist = false
+    });
+    orderSublist(hardList, hardList.length);
+    if (hardList.length > 3){
+        hardList = hardList.slice(-4,-1);
+    }
+    return [hardList, easyList];
+}
+
+function swap(arr, xp, yp){
+    var temp = arr[xp];
+    arr[xp] = arr[yp];
+    arr[yp] = temp;
+}
+
+function orderSublist(List, n){
+    var i, j;
+    for(i = 0; i < n-1; i++){
+        for(j = 0; j < n-i-1; j++){
+            if(List[j][1] > List[j+1][1]){
+                swap(List, j, j+1);
+            }
+        }
+    }
+}
+
+module.exports = { scoreCalculator, findUserWords }
