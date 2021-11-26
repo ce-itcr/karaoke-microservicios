@@ -171,9 +171,20 @@ function findDifficulty(Easy, Difficult){
         exist = false
     });
     orderSublist(easyList, easyList.length);
-    if (easyList.length > 3){
-        easyList = easyList.slice(-4,-1);
-    }
+    var easy = [];
+    var counter = easyList.length - 1;
+    var easyCount = 0;
+    console.log(easyList);
+    console.log(easyList[counter][0]);
+    while(easyCount < 5 && counter >= 0){
+        if(easyList[counter][0].length > 3){
+            easy.push(easyList[counter]);
+            easyCount++;
+        }
+        counter--;
+    };
+    easyList = easy;
+
     Difficult.forEach(element => {
         hardList.forEach(subList => {
             if(subList.includes(element)){
@@ -187,9 +198,18 @@ function findDifficulty(Easy, Difficult){
         exist = false
     });
     orderSublist(hardList, hardList.length);
-    if (hardList.length > 3){
-        hardList = hardList.slice(-4,-1);
-    }
+    var hard = [];
+    var counter = hardList.length - 1;
+    var hardCount = 0;
+    console.log(hardList);
+    while(hardCount < 5 && counter >= 0){
+        if(hardList[counter][0].length > 3){
+            hard.push(hardList[counter]);
+            hardCount++;
+        }
+        counter--;
+    };
+    hardList = hard;
     return [hardList, easyList];
 }
 
