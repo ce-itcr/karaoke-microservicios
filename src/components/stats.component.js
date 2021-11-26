@@ -3,28 +3,28 @@ const { co } = require('co');
 const {getConnection} = require('../shared/connection');
 const { getFullDate, jsonConcat } = require('../shared/utils/utils');
 
-const scoreCalculator = (req, res) => {
+function scoreCalculator(req, res) {
 
-    let userLyrics = req.body.text
-    let actualLyrics = req.body.lyrics
+    let userLyrics = req.body.text;
+    let actualLyrics = req.body.lyrics;
+    let currentUser = req.body.username;
 
-    
     userLyrics = lineToList(userLyrics);
     actualLyrics = lineToList(extractLines(actualLyrics.trim()));
-
-    console.log(userLyrics);
-    console.log(actualLyrics);
 
     var counter = 0;
     var lyricsWords = actualLyrics.length;
     var userWords = userLyrics.length;
     var successCounter = 0;
     var errorCounter = 0;
-
+    var userData;
+    var success = [];
     var errors = [];
+    var response;
 
     while(counter < userWords){
         if(actualLyrics.includes(userLyrics[counter])){
+            success.push(userLyrics[counter]);
             actualLyrics.splice(actualLyrics.indexOf(userLyrics[counter]),1);
             successCounter += 1;
         }else{
@@ -34,16 +34,47 @@ const scoreCalculator = (req, res) => {
         counter++;
     }
 
+    errors = actualLyrics;
+
     score = ((successCounter - errorCounter)/lyricsWords) * 100
     accuracy = ((successCounter - errorCounter)/userWords) * 100
-    
 
-    console.log(successCounter);
-    console.log(errorCounter);
+    response = {"score":Math.round(score), "accuracy":Math.round(accuracy), "successCounter":successCounter, "errorCounter":errorCounter}
 
-    var response = {"score":Math.round(score), "accuracy":Math.round(accuracy), "successCounter":successCounter, "errorCounter":errorCounter}
-
+    getDifficultyArrays(currentUser, success, errors);
     res.status(200).send(response);
+};
+
+function getDifficultyArrays(username, success, errors){
+    const databaseConnection = getConnection();
+    databaseConnection.collection("users").findOne({"userId": username}, { projection: { _id:0 } }, 
+        function(error, data) {
+            if (error) {
+                console.log('⛔️ An error occurred getting single users ... \n[Error]: ' + error);
+                return null;
+            } else {
+                if(data === null){
+                    console.log('⚠️ There are no users with the specified specifications ...');
+                    return null;
+                } else{
+                    success.concat(data["lessDifficulty"]);
+                    errors.concat(data["greaterDifficulty"]);
+                    updateDifficultyArrays(username, errors, success, databaseConnection);
+                }
+            }
+      });
+};
+
+function updateDifficultyArrays(username, diffWords, easyWords, databaseConnection){
+    var newData = { $set: {"lessDifficulty":easyWords, "greaterDifficulty":diffWords}  };
+    databaseConnection.collection('users').updateOne({'userId': username}, newData, 
+        function(error) {
+            if(error) {
+                console.log('⛔️ An error occurred updating difficulties ... \n[Error]: ' + error);  
+            } else {
+                console.log("Datos actualizados");
+            }
+    });
 };
 
 function extractLines (lyrics){
