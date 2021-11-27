@@ -43,6 +43,7 @@ function scoreCalculator(req, res) {
     response = {"score":Math.round(score), "accuracy":Math.round(accuracy), "successCounter":successCounter, "errorCounter":errorCounter}
 
     getDifficultyArrays(currentUser, success, errors);
+    res.set("Content-Security-Policy", "default-src 'self'");
     res.status(200).send(response);
 };
 
@@ -151,6 +152,7 @@ function findUserWords(req, res){
                 } else{
                     var wordsList = await findDifficulty(data["lessDifficulty"], data["greaterDifficulty"]);
                     var message = JSON.stringify({'mostDifficult': wordsList[0], 'leastDifficult': wordsList[1]});
+                    res.set("Content-Security-Policy", "default-src 'self'");
                     return res.status(200).send(message);
                 }
             }
