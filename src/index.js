@@ -9,7 +9,8 @@ const globalSTS = sts.getSTS({'max-age':{'days': 30}});
 
 const app = express();
 app.use(xXssProtection());
-app.use(helmet.frameguard())
+app.use(helmet.frameguard());
+app.use(helmet.contentSecurityPolicy());
 app.use(globalSTS);
 
 app.use(referrerPolicy({ policy: 'same-origin' }))
