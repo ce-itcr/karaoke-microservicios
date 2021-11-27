@@ -1,11 +1,12 @@
 const sts = require('strict-transport-security');
 const express = require('express');
+const helmet = require('helmet')
 const cors = require('cors');
 const PORT = process.env.PORT || 5000;
+const globalSTS = sts.getSTS({'max-age':{'days': 30}});
 
 const app = express();
-const globalSTS = sts.getSTS({'max-age':{'days': 30}});
-//const localSTS = sts.getSTS({'max-age':{'days': 10}, 'includeSubDomains': true});
+app.use(helmet.frameguard())
 app.use(globalSTS);
 app.use(cors());
 app.all('/', function(req, res, next) {
