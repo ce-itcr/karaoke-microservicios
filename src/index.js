@@ -1,8 +1,12 @@
+const sts = require('strict-transport-security');
 const express = require('express');
 const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 
 const app = express();
+const globalSTS = sts.getSTS({'max-age':{'days': 30}});
+//const localSTS = sts.getSTS({'max-age':{'days': 10}, 'includeSubDomains': true});
+app.use(globalSTS);
 app.use(cors());
 app.all('/', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", '*');

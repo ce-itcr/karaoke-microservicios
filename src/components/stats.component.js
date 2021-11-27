@@ -3,6 +3,7 @@ const { co } = require('co');
 const {getConnection} = require('../shared/connection');
 const { getFullDate, jsonConcat } = require('../shared/utils/utils');
 
+
 function scoreCalculator(req, res) {
 
     let userLyrics = req.body.text;
