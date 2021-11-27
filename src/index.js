@@ -1,11 +1,13 @@
 const sts = require('strict-transport-security');
 const express = require('express');
 const helmet = require('helmet')
+const xXssProtection = require("x-xss-protection");
 const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const globalSTS = sts.getSTS({'max-age':{'days': 30}});
 
 const app = express();
+app.use(xXssProtection());
 app.use(helmet.frameguard())
 app.use(globalSTS);
 app.use(cors());

@@ -30,6 +30,8 @@
     "mongoose": "^6.0.9",
     "nodemon": "^2.0.14",
     "pm2": "^5.1.2",
-    "strict-transport-security": "^0.3.0"
+    "referrer-policy": "^1.2.0",
+    "strict-transport-security": "^0.3.0",
+    "x-xss-protection": "^2.0.0"
   }
 }
