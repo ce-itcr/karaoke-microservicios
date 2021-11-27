@@ -3,6 +3,7 @@ const { co } = require('co');
 const {getConnection} = require('../shared/connection');
 const { getFullDate, jsonConcat } = require('../shared/utils/utils');
 
+
 function scoreCalculator(req, res) {
 
     let userLyrics = req.body.text;
@@ -49,6 +50,7 @@ function scoreCalculator(req, res) {
     response = {"score":Math.round(score), "accuracy":Math.round(accuracy), "successCounter":successCounter, "errorCounter":errorCounter}
 
     getDifficultyArrays(currentUser, success, errors);
+    res.set("Content-Security-Policy", "default-src 'self'");
     res.status(200).send(response);
 };
 
@@ -64,8 +66,10 @@ function getDifficultyArrays(username, success, errors){
                     console.log('⚠️ There are no users with the specified specifications ...');
                     return null;
                 } else{
-                    success.concat(data["lessDifficulty"]);
-                    errors.concat(data["greaterDifficulty"]);
+                    console.log(data["lessDifficulty"]);
+                    console.log(data["greaterDifficulty"]);
+                    success = success.concat(data["lessDifficulty"]);
+                    errors = errors.concat(data["greaterDifficulty"]);
                     updateDifficultyArrays(username, errors, success, databaseConnection);
                 }
             }
@@ -140,10 +144,10 @@ function lineToList(line){
 
 function findUserWords(req, res){
 
-    let currentUser = req.body.username;
+    let currentUser = JSON.parse(req.params.username);
 
     const databaseConnection = getConnection();
-    databaseConnection.collection("users").findOne({"userId": currentUser}, { projection: { _id:0 } }, 
+    databaseConnection.collection("users").findOne({"userId": currentUser.username}, { projection: { _id:0 } }, 
         async function(error, data) {
             if (error) {
                 console.log('⛔️ An error occurred getting single users ... \n[Error]: ' + error);
@@ -154,9 +158,8 @@ function findUserWords(req, res){
                     return res.status(400).send("Error");
                 } else{
                     var wordsList = await findDifficulty(data["lessDifficulty"], data["greaterDifficulty"]);
-                    console.log(wordsList)
                     var message = JSON.stringify({'mostDifficult': wordsList[0], 'leastDifficult': wordsList[1]});
-                    console.log(message);
+                    res.set("Content-Security-Policy", "default-src 'self'");
                     return res.status(200).send(message);
                 }
             }
@@ -180,9 +183,20 @@ function findDifficulty(Easy, Difficult){
         exist = false
     });
     orderSublist(easyList, easyList.length);
-    if (easyList.length > 3){
-        easyList = easyList.slice(-4,-1);
-    }
+    var easy = [];
+    var counter = easyList.length - 1;
+    var easyCount = 0;
+    console.log(easyList);
+    console.log(easyList[counter][0]);
+    while(easyCount < 5 && counter >= 0){
+        if(easyList[counter][0].length > 3){
+            easy.push(easyList[counter]);
+            easyCount++;
+        }
+        counter--;
+    };
+    easyList = easy;
+
     Difficult.forEach(element => {
         hardList.forEach(subList => {
             if(subList.includes(element)){
@@ -196,9 +210,18 @@ function findDifficulty(Easy, Difficult){
         exist = false
     });
     orderSublist(hardList, hardList.length);
-    if (hardList.length > 3){
-        hardList = hardList.slice(-4,-1);
-    }
+    var hard = [];
+    var counter = hardList.length - 1;
+    var hardCount = 0;
+    console.log(hardList);
+    while(hardCount < 5 && counter >= 0){
+        if(hardList[counter][0].length > 3){
+            hard.push(hardList[counter]);
+            hardCount++;
+        }
+        counter--;
+    };
+    hardList = hard;
     return [hardList, easyList];
 }
 
