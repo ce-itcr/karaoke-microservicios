@@ -39,6 +39,13 @@ function scoreCalculator(req, res) {
     score = ((successCounter - errorCounter)/lyricsWords) * 100
     accuracy = ((successCounter - errorCounter)/userWords) * 100
 
+    if (score < 0){
+        score = 0;
+    }
+    if (accuracy < 0){
+        accuracy = 0;
+    }
+
     response = {"score":Math.round(score), "accuracy":Math.round(accuracy), "successCounter":successCounter, "errorCounter":errorCounter}
 
     getDifficultyArrays(currentUser, success, errors);
