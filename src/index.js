@@ -2,6 +2,7 @@ const sts = require('strict-transport-security');
 const express = require('express');
 const helmet = require('helmet')
 const xXssProtection = require("x-xss-protection");
+const referrerPolicy = require('referrer-policy')
 const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const globalSTS = sts.getSTS({'max-age':{'days': 30}});
@@ -10,6 +11,11 @@ const app = express();
 app.use(xXssProtection());
 app.use(helmet.frameguard())
 app.use(globalSTS);
+
+app.use(referrerPolicy({ policy: 'same-origin' }))
+app.use(referrerPolicy({ policy: 'unsafe-url' }))
+app.use(referrerPolicy())
+
 app.use(cors());
 app.all('/', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", '*');
