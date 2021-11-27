@@ -57,8 +57,10 @@ function getDifficultyArrays(username, success, errors){
                     console.log('⚠️ There are no users with the specified specifications ...');
                     return null;
                 } else{
-                    success.concat(data["lessDifficulty"]);
-                    errors.concat(data["greaterDifficulty"]);
+                    console.log(data["lessDifficulty"]);
+                    console.log(data["greaterDifficulty"]);
+                    success = success.concat(data["lessDifficulty"]);
+                    errors = errors.concat(data["greaterDifficulty"]);
                     updateDifficultyArrays(username, errors, success, databaseConnection);
                 }
             }
