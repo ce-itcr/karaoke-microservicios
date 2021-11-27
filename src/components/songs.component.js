@@ -35,7 +35,7 @@ const getSingleSong = async (req, res) => {
 
 const createSong = (req, res) => {
     let songId = req.body.songName + "&" + req.body.songAuthor
-    let generatedData = { id: req.body.songName + "&" + req.body.songAuthor, creationDate: getFullDate(), played: '0', songLevel: "hard" };
+    let generatedData = { id: req.body.songName + "&" + req.body.songAuthor, creationDate: getFullDate(), played: 0, songLevel: "hard" };
     var jsonBodyAndGeneratedData = jsonConcat(req.body, generatedData)
 
     const databaseConnection = getConnection();
